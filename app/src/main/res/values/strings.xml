@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">彩票管家</string>
+    <string-array name="lottery_types">
+        <item>双色球</item>
+        <item>大乐透</item>
+    </string-array>
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="16dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button android:id="@+id/btnRefresh" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="刷新" android:textAllCaps="false" />
+        <Button android:id="@+id/btnOcr" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="图片识别" android:textAllCaps="false"
+            android:layout_marginStart="8dp" />
+        <Button android:id="@+id/btnLogout" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="退出" android:textAllCaps="false"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <TextView android:id="@+id/tvEmpty" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="" android:textColor="#888"
+        android:layout_marginVertical="12dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" />
+
+    <Button android:id="@+id/fabAdd" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:text="＋ 添加彩票"
+        android:textAllCaps="false" android:layout_marginTop="8dp" />
+</LinearLayout>
