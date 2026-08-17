@@ -1,31 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 我的购彩列表项（彩票卡片） -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="vertical" android:padding="14dp"
-    android:background="@android:color/white"
-    android:layout_marginBottom="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="20dp"
+    android:layout_marginBottom="16dp">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:gravity="center_vertical">
-        <TextView android:id="@+id/tvTitle" android:layout_width="0dp"
-            android:layout_height="wrap_content" android:layout_weight="1"
-            android:textStyle="bold" android:textSize="15sp" />
-        <TextView android:id="@+id/tvStatus" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:textSize="13sp"
-            android:textColor="#e23b3b" android:text="未开奖" />
+    <!-- 顶部：彩种 chip + 期号 + 玩法 + 状态 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/chipType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/red"
+            android:textSize="12sp"
+            android:textFontWeight="600"
+            android:background="@drawable/bg_seg_on"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvIssue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/text"
+            android:textSize="14sp"
+            android:textFontWeight="600" />
+
+        <TextView
+            android:id="@+id/chipPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/muted"
+            android:textSize="12sp"
+            android:textFontWeight="600"
+            android:background="@drawable/bg_seg_on"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/chipMult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/primary"
+            android:textSize="12sp"
+            android:textFontWeight="600"
+            android:background="@drawable/bg_seg_on"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/badgeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:textColor="@color/badge_gray_fg"
+            android:textSize="12sp"
+            android:textFontWeight="600"
+            android:background="@drawable/bg_seg_on"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/selectCheck"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="@drawable/bg_select_check"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textFontWeight="700"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <TextView android:id="@+id/tvBalls" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:textSize="13sp"
-        android:textColor="#444" android:layout_marginTop="6dp" />
+    <!-- 球号 -->
+    <LinearLayout
+        android:id="@+id/ballsRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp" />
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="8dp">
-        <Button android:id="@+id/btnDelete" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="删除"
-            android:textAllCaps="false" />
-        <Button android:id="@+id/btnRedeem" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="标记已兑奖"
-            android:textAllCaps="false" android:layout_marginStart="8dp" />
+    <!-- 底部：命中信息 + 注数 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvMatch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/muted"
+            android:textSize="12sp"
+            android:textFontWeight="600" />
+
+        <TextView
+            android:id="@+id/tvBets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

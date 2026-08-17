@@ -1,7 +1,133 @@
 <resources>
     <string name="app_name">彩票管家</string>
-    <string-array name="lottery_types">
-        <item>双色球</item>
-        <item>大乐透</item>
-    </string-array>
+
+    <!-- Tab -->
+    <string name="tab_add">录入</string>
+    <string name="tab_draw">开奖</string>
+    <string name="tab_buy">购彩</string>
+    <string name="tab_profile">我的</string>
+
+    <!-- 登录页 -->
+    <string name="login_logo">彩</string>
+    <string name="login_title">彩票管家</string>
+    <string name="login_subtitle">双色球 · 大乐透 彩票管理</string>
+    <string name="login_tab_login">登录</string>
+    <string name="login_tab_register">注册</string>
+    <string name="login_tab_device">设备登录</string>
+    <string name="login_username">用户名</string>
+    <string name="login_username_hint">请输入用户名</string>
+    <string name="login_password">密码</string>
+    <string name="login_password_hint">请输入密码</string>
+    <string name="login_email">邮箱（选填，中奖时用于通知）</string>
+    <string name="login_email_hint">you@example.com</string>
+    <string name="login_action_login">登录</string>
+    <string name="login_action_register">注册并登录</string>
+    <string name="login_tip">设备登录：本机生成持久设备号，下次打开自动登录，无需记密码。</string>
+
+    <!-- 录入页 -->
+    <string name="add_seg_ssq">双色球</string>
+    <string name="add_seg_dlt">大乐透</string>
+    <string name="add_mode_single">单式</string>
+    <string name="add_mode_compound">复式</string>
+    <string name="add_mode_banker">胆拖</string>
+    <string name="add_field_date">开奖日期</string>
+    <string name="add_field_date_hint">可改选其它开奖日期（已默认最近一期）</string>
+    <string name="add_optgroup_upcoming">未开奖 · 可购买</string>
+    <string name="add_optgroup_history">已开奖 · 可补录旧票</string>
+    <string name="add_field_date_tip">默认选“未开奖”期，买的是未来开奖的彩票</string>
+    <string name="add_field_issue">期号</string>
+    <string name="add_field_issue_hint">如 2026-08-20</string>
+    <string name="add_field_issue_tip">暂无开奖数据，可手动填写期号</string>
+    <string name="add_preview_head">本轮已选（实时）</string>
+    <string name="add_preview_tag_red_ssq">红球</string>
+    <string name="add_preview_tag_red_dlt">前区</string>
+    <string name="add_preview_tag_blue_ssq">蓝球</string>
+    <string name="add_preview_tag_blue_dlt">后区</string>
+    <string name="add_preview_tag_red_banker">红胆</string>
+    <string name="add_preview_tag_blue_banker">蓝胆</string>
+    <string name="add_preview_empty">未选</string>
+    <string name="add_preview_empty_banker">未设</string>
+    <string name="add_ocr_text">上传彩票截图，自动识别号码</string>
+    <string name="add_ocr_busy">识别中…</string>
+    <string name="add_ocr_preview_tip">已选择图片，正在识别…</string>
+    <string name="add_ocr_multi_head">识别到 %1$d 注，请核对后一键保存</string>
+    <string name="add_ocr_multi_save">保存全部 %1$d 注</string>
+    <string name="add_ocr_multi_cancel">取消</string>
+    <string name="add_batch_entry">批量录入（多张）</string>
+    <string name="add_multiple_label">倍数</string>
+    <string name="add_save_bar_type_mode">%1$s · %2$s</string>
+    <string name="add_save_bar_summary">开奖日 %1$s · %2$d 注 × %3$d 倍 = ¥%4$d</string>
+    <string name="add_save">保存彩票</string>
+
+    <!-- 批量弹窗 -->
+    <string name="batch_title">批量录入</string>
+    <string name="batch_hint">每行一条，格式：彩种,期号,红球,蓝球</string>
+    <string name="batch_example">示例：ssq,2024080,03 08 15 20 21 24,09</string>
+    <string name="batch_placeholder">ssq,2024080,03 08 15 20 21 24,09&#10;dlt,24080,03 04 07 12 32,01 02</string>
+    <string name="batch_ok">成功 %1$d 条</string>
+    <string name="batch_fail">失败 %1$d 条</string>
+    <string name="batch_close">关闭</string>
+    <string name="batch_submit">开始录入</string>
+
+    <!-- 开奖页 -->
+    <string name="draw_eyebrow">开奖数据</string>
+    <string name="draw_title">开奖结果</string>
+    <string name="draw_sub">官方开奖数据 · 定时自动拉取</string>
+    <string name="draw_empty">暂无开奖数据</string>
+    <string name="draw_issue_prefix">第 </string>
+    <string name="draw_issue_suffix"> 期</string>
+
+    <!-- 购彩页 -->
+    <string name="buy_eyebrow">购彩</string>
+    <string name="buy_title">我的购彩</string>
+    <string name="buy_sub_total">共</string>
+    <string name="buy_sub_pending">待开奖</string>
+    <string name="buy_sub_wins">已中奖</string>
+    <string name="buy_latest_issue_prefix">第 </string>
+    <string name="buy_latest_issue_suffix"> 期</string>
+    <string name="buy_filter_type_all">全部彩种</string>
+    <string name="buy_filter_status_all">全部状态</string>
+    <string name="buy_select_hint">长按卡片可进入多选，批量分享或删除</string>
+    <string name="buy_empty">还没有彩票，去「录入」页添加吧</string>
+    <string name="buy_status_pending">待开奖</string>
+    <string name="buy_status_miss">未中奖</string>
+    <string name="buy_status_won_default">已中奖</string>
+    <string name="buy_match_text_prefix">命中 </string>
+    <string name="buy_not_drawn">该期尚未开奖</string>
+    <string name="buy_not_matched">未命中</string>
+    <string name="buy_select_cancel">取消</string>
+    <string name="buy_select_share">分享</string>
+    <string name="buy_select_delete">删除</string>
+    <string name="buy_select_count">已选 %1$d 张</string>
+    <string name="buy_select_delete_confirm">确定删除选中的 %1$d 张彩票？</string>
+    <string name="buy_share_header">【我的彩票】\n共 %1$d 张\n──────────\n</string>
+    <string name="buy_share_nothing">还没有彩票可分享</string>
+    <string name="buy_share_copied">已复制到剪贴板</string>
+    <string name="buy_share_copy_fail">复制失败</string>
+    <string name="buy_share_unsupported">当前环境不支持分享</string>
+    <string name="buy_deleted">已删除 %1$d 张</string>
+    <string name="buy_bets_suffix"> 注</string>
+
+    <!-- 我的页 -->
+    <string name="profile_eyebrow">我的</string>
+    <string name="profile_title">个人中心</string>
+    <string name="profile_sub">管理账户资料与购彩记录</string>
+    <string name="profile_device_prefix">设备号 </string>
+    <string name="profile_field_username">用户名</string>
+    <string name="profile_field_email">邮箱</string>
+    <string name="profile_field_email_empty">未填写</string>
+    <string name="profile_field_email_hint">用于接收中奖通知</string>
+    <string name="profile_field_created">注册时间</string>
+    <string name="profile_action_edit">编辑资料</string>
+    <string name="profile_action_cancel">取消</string>
+    <string name="profile_action_save">保存</string>
+    <string name="profile_stat_total">彩票总数</string>
+    <string name="profile_stat_wins">中奖次数</string>
+    <string name="profile_stat_pending">待开奖</string>
+    <string name="profile_logout">退出登录</string>
+
+    <!-- 通用 -->
+    <string name="empty_preview">未选</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
 </resources>

@@ -1,29 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button android:id="@+id/btnRefresh" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="刷新" android:textAllCaps="false" />
-        <Button android:id="@+id/btnOcr" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="图片识别" android:textAllCaps="false"
-            android:layout_marginStart="8dp" />
-        <Button android:id="@+id/btnLogout" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="退出" android:textAllCaps="false"
-            android:layout_marginStart="8dp" />
+    <FrameLayout
+        android:id="@+id/navHost"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/tabbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabbar_height"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_tabbar"
+        android:elevation="8dp">
+
+        <LinearLayout
+            android:id="@+id/tabAdd"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iconAdd"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@drawable/ic_tab_add"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/textAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_add"
+                android:textColor="@color/muted"
+                android:textSize="11sp"
+                android:textFontWeight="600"
+                android:layout_marginTop="3dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabDraw"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iconDraw"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@drawable/ic_tab_draw"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/textDraw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_draw"
+                android:textColor="@color/muted"
+                android:textSize="11sp"
+                android:textFontWeight="600"
+                android:layout_marginTop="3dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabBuy"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iconBuy"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@drawable/ic_tab_buy"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/textBuy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_buy"
+                android:textColor="@color/muted"
+                android:textSize="11sp"
+                android:textFontWeight="600"
+                android:layout_marginTop="3dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/iconProfile"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:src="@drawable/ic_tab_profile"
+                android:importantForAccessibility="no" />
+
+            <TextView
+                android:id="@+id/textProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_profile"
+                android:textColor="@color/muted"
+                android:textSize="11sp"
+                android:textFontWeight="600"
+                android:layout_marginTop="3dp" />
+        </LinearLayout>
     </LinearLayout>
-
-    <TextView android:id="@+id/tvEmpty" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:text="" android:textColor="#888"
-        android:layout_marginVertical="12dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1" />
-
-    <Button android:id="@+id/fabAdd" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:text="＋ 添加彩票"
-        android:textAllCaps="false" android:layout_marginTop="8dp" />
 </LinearLayout>

@@ -8,18 +8,22 @@
         android:name=".LotteryApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="彩票管家"
-        android:theme="@style/Theme.Lottery">
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Lottery"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.MainActivity" android:exported="false" />
-        <activity android:name=".ui.AddLotteryActivity" android:exported="false" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
