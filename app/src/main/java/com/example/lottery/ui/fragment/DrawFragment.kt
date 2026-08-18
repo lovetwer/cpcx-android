@@ -31,7 +31,6 @@ class DrawFragment : Fragment() {
         binding.tabSsq.setOnClickListener { switchType("ssq") }
         binding.tabDlt.setOnClickListener { switchType("dlt") }
         updateTabs()
-        load()
     }
 
     override fun onResume() {

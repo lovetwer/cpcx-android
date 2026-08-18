@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import com.example.lottery.data.Api
 import com.example.lottery.data.model.User
 import com.example.lottery.databinding.FragmentProfileBinding
 import com.example.lottery.ui.widget.ToastUtil
+import com.example.lottery.update.UpdateManager
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
@@ -35,6 +37,7 @@ class ProfileFragment : Fragment() {
         binding.btnCancelEdit.setOnClickListener { exitEdit() }
         binding.btnSave.setOnClickListener { saveProfile() }
         binding.btnLogout.setOnClickListener { logout() }
+        binding.btnCheckUpdate.setOnClickListener { checkUpdate() }
         binding.btnChangePwd.setOnClickListener { openPwdPanel() }
         binding.btnCancelPwd.setOnClickListener { closePwdPanel() }
         binding.btnSavePwd.setOnClickListener { savePassword() }
@@ -192,6 +195,13 @@ class ProfileFragment : Fragment() {
             } catch (e: Exception) {
                 // 静默失败，保留占位
             }
+        }
+    }
+
+    private fun checkUpdate() {
+        val act = requireActivity()
+        if (act is AppCompatActivity) {
+            UpdateManager(act).checkForUpdate(manual = true)
         }
     }
 

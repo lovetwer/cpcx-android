@@ -227,7 +227,7 @@ class BuyFragment : Fragment() {
         if (t.isEmpty()) return ""
         val dm = t.firstOrNull { it.isDigit() }
         if (dm != null) return dm.toString()
-        val cn = mapOf('一' to '1', '二' to '2', '两' to '2', '三' to '3', '四' to '4', '五' to '5', '六' to '6')
+        val cn = mapOf('一' to '1', '二' to '2', '两' to '2', '三' to '3', '四' to '4', '五' to '5', '六' to '6', '七' to '7', '福' to '8')
         for (ch in t) if (cn[ch] != null) return cn[ch].toString()
         return ""
     }

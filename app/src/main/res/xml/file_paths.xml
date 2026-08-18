@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider 暴露的目录：安装更新 APK 时使用 content:// URI 而不是直接 file:// -->
+<paths>
+    <!-- getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) 对应的路径 -->
+    <external-files-path name="updates" path="Download" />
+</paths>

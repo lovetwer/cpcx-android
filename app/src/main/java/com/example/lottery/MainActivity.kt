@@ -12,6 +12,7 @@ import com.example.lottery.ui.fragment.AddFragment
 import com.example.lottery.ui.fragment.BuyFragment
 import com.example.lottery.ui.fragment.DrawFragment
 import com.example.lottery.ui.fragment.ProfileFragment
+import com.example.lottery.update.UpdateManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +54,9 @@ class MainActivity : AppCompatActivity() {
         binding.navProfile.setOnClickListener { setTab(3) }
 
         setTab(0)
+
+        // 启动后静默检查版本更新（有新版本才弹窗，无更新不提示）
+        UpdateManager(this).checkForUpdate(manual = false)
     }
 
     fun setTab(index: Int) {

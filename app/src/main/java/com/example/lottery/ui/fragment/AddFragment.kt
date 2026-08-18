@@ -25,6 +25,7 @@ import com.example.lottery.data.model.ParsedLot
 import com.example.lottery.databinding.FragmentAddBinding
 import com.example.lottery.databinding.DialogBatchBinding
 import com.example.lottery.ui.widget.BallsView
+import com.example.lottery.ui.widget.AIPredictLoadingView
 import com.example.lottery.ui.widget.BallPickerView
 import com.example.lottery.ui.widget.ToastUtil
 import com.example.lottery.util.ImageUtil
@@ -501,12 +502,18 @@ class AddFragment : Fragment() {
     /* ---------------- AI 预测 ---------------- */
 
     private fun doAIPredict() {
-        // 显示加载对话框
+        // 创建与 Web 端一致的 AI 预测 loading 视图
+        val loadingView = AIPredictLoadingView(requireContext())
+        loadingView.start()
+
+        // 使用 Dialog 全屏遮罩，半透明黑色背景（与 Web 端 rgba(15,15,20,0.75) 一致）
         val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_DeviceDefault_Dialog_NoActionBar)
-            .setView(createLoadingView())
+            .setView(loadingView)
             .setCancelable(false)
             .create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        // 遮罩背景半透明黑
+        dialog.window?.setDimAmount(0.75f)
         dialog.show()
 
         lifecycleScope.launch {
@@ -535,6 +542,7 @@ class AddFragment : Fragment() {
 
                 // 4. 校验并填充
                 if (reds.size < cfg.minRed || blues.size < cfg.minBlue) {
+                    loadingView.stop()
                     dialog.dismiss()
                     ToastUtil.show(requireContext(), "AI 返回号码数量不足，已退回机选", "warn")
                     randomPickFallback()
@@ -542,6 +550,7 @@ class AddFragment : Fragment() {
                 }
 
                 binding.ballPicker.setPicked(reds, blues)
+                loadingView.stop()
                 dialog.dismiss()
                 ToastUtil.show(requireContext(), "AI 预测已填充", "success")
 
@@ -551,51 +560,12 @@ class AddFragment : Fragment() {
                     showReasonDialog(reason)
                 }
             } catch (e: Exception) {
+                loadingView.stop()
                 dialog.dismiss()
                 ToastUtil.show(requireContext(), e.message ?: "AI 预测失败，已退回机选", "warn")
                 randomPickFallback()
             }
         }
-    }
-
-    private fun createLoadingView(): View {
-        val container = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = android.view.Gravity.CENTER
-            setPadding(dp(40), dp(40), dp(40), dp(40))
-        }
-
-        // 进度条
-        val progress = android.widget.ProgressBar(requireContext(), null, android.R.attr.progressBarStyleLarge)
-        progress.indeterminateDrawable.setTint(ContextCompat.getColor(requireContext(), R.color.primary))
-        container.addView(progress)
-
-        // 标题
-        val title = TextView(requireContext()).apply {
-            text = "AI 正在分析近30期开奖数据…"
-            textSize = 16f
-            setTypeface(null, android.graphics.Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            gravity = android.view.Gravity.CENTER
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            lp.topMargin = dp(20)
-            layoutParams = lp
-        }
-        container.addView(title)
-
-        // 副标题
-        val sub = TextView(requireContext()).apply {
-            text = "冷热号 · 遗漏值 · 区间分区 · 重邻孤"
-            textSize = 13f
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.muted))
-            gravity = android.view.Gravity.CENTER
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            lp.topMargin = dp(8)
-            layoutParams = lp
-        }
-        container.addView(sub)
-
-        return container
     }
 
     private fun randomPickFallback() {

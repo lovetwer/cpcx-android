@@ -54,6 +54,10 @@ class LotteryApp : Application() {
         // 前端 Web 站点域名：分享链接统一指向这里（注意不要误用上面的后端 API 域名）
         const val WEB_BASE_URL = "https://cpcx.800820882.xyz"
 
+        // 应用内更新：APK 托管在 GitHub Releases（仓库 owner/repo，latest 直链下载）
+        const val GITHUB_OWNER = "lovetwer"
+        const val GITHUB_REPO = "cpcx-android"
+
         lateinit var instance: LotteryApp
             private set
     }
