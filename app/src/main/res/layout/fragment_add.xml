@@ -250,43 +250,60 @@
                 android:textStyle="bold"
                 android:textColor="@color/text" />
 
-            <LinearLayout
+            <View
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_weight="1"
-                android:layout_gravity="end"
-                android:gravity="end">
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-                <Button
+            <LinearLayout
+                android:id="@+id/stepper"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp">
+
+                <TextView
                     android:id="@+id/stepMinus"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_card"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_circle_primary"
                     android:text="−"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text" />
+                    android:textColor="@color/white"
+                    android:includeFontPadding="false"
+                    android:clickable="true"
+                    android:focusable="true" />
 
                 <EditText
                     android:id="@+id/stepInput"
-                    android:layout_width="54dp"
-                    android:layout_height="34dp"
+                    android:layout_width="46dp"
+                    android:layout_height="match_parent"
                     android:gravity="center"
-                    android:background="@drawable/bg_card"
+                    android:background="@null"
                     android:inputType="number"
                     android:text="1"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/stepPlus"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:background="@drawable/bg_card"
-                    android:text="+"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/text" />
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/stepPlus"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_circle_primary"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:includeFontPadding="false"
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
         </LinearLayout>
 
