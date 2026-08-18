@@ -51,6 +51,9 @@ class LotteryApp : Application() {
         // TODO: 改成你的后端地址（部署到服务器后填公网地址；本地调试填局域网 IP）
         const val BASE_URL = "https://cpcxapi.800820882.xyz"
 
+        // 前端 Web 站点域名：分享链接统一指向这里（注意不要误用上面的后端 API 域名）
+        const val WEB_BASE_URL = "https://cpcx.800820882.xyz"
+
         lateinit var instance: LotteryApp
             private set
     }
