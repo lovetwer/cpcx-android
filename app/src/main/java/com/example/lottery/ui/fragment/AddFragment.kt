@@ -89,6 +89,7 @@ class AddFragment : Fragment() {
             val n = it.toIntOrNull() ?: 1
             multiple = n.coerceIn(1, 99)
             updateSaveSummary()
+            updatePreview()
         })
 
         binding.saveBtn.setOnClickListener { save() }
@@ -281,6 +282,7 @@ class AddFragment : Fragment() {
         multiple = v.coerceIn(1, 99)
         binding.stepInput.setText(multiple.toString())
         updateSaveSummary()
+        updatePreview()
     }
 
     /* ---------------- 校验 / 保存 ---------------- */
