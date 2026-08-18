@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/bg">
 
     <FrameLayout
-        android:id="@+id/navHost"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- 底部 Tab 栏（对应网页 AppNav.vue：录入 / 开奖 / 购彩 / 我的） -->
     <LinearLayout
-        android:id="@+id/tabbar"
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/tabbar_height"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/bg_tabbar"
-        android:elevation="8dp">
+        android:background="@color/surface"
+        android:elevation="8dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
-            android:id="@+id/tabAdd"
+            android:id="@+id/navAdd"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -36,26 +38,28 @@
                 android:layout_width="23dp"
                 android:layout_height="23dp"
                 android:src="@drawable/ic_tab_add"
-                android:importantForAccessibility="no" />
+                android:tint="@color/muted" />
 
             <TextView
-                android:id="@+id/textAdd"
+                android:id="@+id/labelAdd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="@string/tab_add"
-                android:textColor="@color/muted"
                 android:textSize="11sp"
-                android:textFontWeight="600"
-                android:layout_marginTop="3dp" />
+                android:textStyle="bold"
+                android:textColor="@color/muted" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/tabDraw"
+            android:id="@+id/navDraw"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -64,26 +68,28 @@
                 android:layout_width="23dp"
                 android:layout_height="23dp"
                 android:src="@drawable/ic_tab_draw"
-                android:importantForAccessibility="no" />
+                android:tint="@color/muted" />
 
             <TextView
-                android:id="@+id/textDraw"
+                android:id="@+id/labelDraw"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="@string/tab_draw"
-                android:textColor="@color/muted"
                 android:textSize="11sp"
-                android:textFontWeight="600"
-                android:layout_marginTop="3dp" />
+                android:textStyle="bold"
+                android:textColor="@color/muted" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/tabBuy"
+            android:id="@+id/navBuy"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -92,26 +98,28 @@
                 android:layout_width="23dp"
                 android:layout_height="23dp"
                 android:src="@drawable/ic_tab_buy"
-                android:importantForAccessibility="no" />
+                android:tint="@color/muted" />
 
             <TextView
-                android:id="@+id/textBuy"
+                android:id="@+id/labelBuy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="@string/tab_buy"
-                android:textColor="@color/muted"
                 android:textSize="11sp"
-                android:textFontWeight="600"
-                android:layout_marginTop="3dp" />
+                android:textStyle="bold"
+                android:textColor="@color/muted" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/tabProfile"
+            android:id="@+id/navProfile"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -120,17 +128,17 @@
                 android:layout_width="23dp"
                 android:layout_height="23dp"
                 android:src="@drawable/ic_tab_profile"
-                android:importantForAccessibility="no" />
+                android:tint="@color/muted" />
 
             <TextView
-                android:id="@+id/textProfile"
+                android:id="@+id/labelProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="@string/tab_profile"
-                android:textColor="@color/muted"
                 android:textSize="11sp"
-                android:textFontWeight="600"
-                android:layout_marginTop="3dp" />
+                android:textStyle="bold"
+                android:textColor="@color/muted" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

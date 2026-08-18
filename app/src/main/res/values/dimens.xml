@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 圆角 -->
+    <dimen name="radius_card">14dp</dimen>
+    <dimen name="radius_btn">9dp</dimen>
+    <dimen name="radius_input">10dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+
+    <!-- 间距 -->
+    <dimen name="page_pad_x">16dp</dimen>
+    <dimen name="gap">16dp</dimen>
+
+    <!-- 球号 -->
+    <dimen name="ball_size">32dp</dimen>
+    <dimen name="ball_size_sm">26dp</dimen>
+    <dimen name="ball_size_lg">22dp</dimen>
+    <dimen name="pick_size">0dp</dimen><!-- 选球用正方形网格，尺寸自适应 -->
+</resources>

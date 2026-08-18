@@ -1,5 +1,5 @@
-// 根 build.gradle（使用 plugins 块，版本在 settings.gradle 中声明）
+// 项目级 build.gradle（彩票管家 · 原生安卓）
 plugins {
-    id 'com.android.application' version '8.2.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
+    id 'com.android.application' version '8.5.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.24' apply false
 }

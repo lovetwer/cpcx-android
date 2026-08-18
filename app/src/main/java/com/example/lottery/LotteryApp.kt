@@ -1,43 +1,57 @@
 package com.example.lottery
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
-import android.provider.Settings
-import com.google.gson.Gson
+import com.example.lottery.data.AuthStore
+import com.example.lottery.util.initDp
+import com.example.lottery.data.ApiService
+import com.google.gson.GsonBuilder
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 /**
- * 全局 Application：保存后端地址、登录 Token、设备号、用户信息。
- * 与网页 store/auth.js 对齐。
+ * 全局 Application：持有 Retrofit 实例、鉴权拦截器、AuthStore。
+ * BASE_URL 改成你的后端地址（本地调试可用电脑局域网 IP，例如 http://192.168.1.10:8080）。
  */
 class LotteryApp : Application() {
-
-    companion object {
-        // 后端 API 地址（与 web/src/api/http.js 中 BASE_URL 保持一致）
-        const val BASE_URL = "https://cpcxapi.800820882.xyz/"
-
-        lateinit var prefs: SharedPreferences
-        lateinit var deviceId: String
-
-        fun getToken(): String = prefs.getString("token", "") ?: ""
-        fun setToken(t: String) { prefs.edit().putString("token", t).apply() }
-        fun clearToken() {
-            prefs.edit().remove("token").apply()
-            prefs.edit().remove("user").apply()
-        }
-
-        fun getUser(): model.User? {
-            val s = prefs.getString("user", null) ?: return null
-            return try { Gson().fromJson(s, model.User::class.java) } catch (e: Exception) { null }
-        }
-        fun setUser(u: model.User) {
-            prefs.edit().putString("user", Gson().toJson(u)).apply()
-        }
-    }
+    lateinit var api: ApiService
+        private set
+    lateinit var authStore: AuthStore
+        private set
 
     override fun onCreate() {
         super.onCreate()
-        prefs = getSharedPreferences("lottery_prefs", Context.MODE_PRIVATE)
-        deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID) ?: ("android-" + System.currentTimeMillis())
+        instance = this
+        initDp(this)
+
+        authStore = AuthStore(this)
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val req = chain.request()
+                val builder = req.newBuilder()
+                val token = authStore.token
+                if (token.isNotEmpty()) {
+                    builder.addHeader("Authorization", "Bearer $token")
+                }
+                chain.proceed(builder.build())
+            }
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+
+        api = retrofit.create(ApiService::class.java)
+    }
+
+    companion object {
+        // TODO: 改成你的后端地址（部署到服务器后填公网地址；本地调试填局域网 IP）
+        const val BASE_URL = "https://cpcxapi.800820882.xyz"
+
+        lateinit var instance: LotteryApp
+            private set
     }
 }

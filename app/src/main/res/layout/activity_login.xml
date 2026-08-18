@@ -1,211 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_login_page">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:padding="20dp">
+    android:background="@drawable/bg_login"
+    android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:background="@drawable/bg_login_card"
-            android:paddingHorizontal="30dp"
-            android:paddingVertical="34dp"
-            android:elevation="6dp">
+            android:gravity="center_horizontal|top"
+            android:padding="20dp">
 
-            <!-- Logo -->
-            <TextView
-                android:id="@+id/loginLogo"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:background="@drawable/bg_login_logo"
-                android:gravity="center"
-                android:text="@string/login_logo"
-                android:textColor="@color/white"
-                android:textSize="26sp"
-                android:textFontWeight="800"
-                android:layout_marginBottom="12dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:paddingStart="30dp"
+            android:paddingTop="34dp"
+            android:paddingEnd="30dp"
+            android:paddingBottom="34dp"
+            android:elevation="10dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_title"
-                android:textColor="@color/text"
-                android:textSize="25sp"
-                android:textFontWeight="700"
-                android:letterSpacing="-0.02"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="5dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login_subtitle"
-                android:textColor="@color/muted"
-                android:textSize="13sp"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Tabs -->
+            <!-- 头部 -->
             <LinearLayout
-                android:id="@+id/loginTabs"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_seg"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="24dp">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_logo">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="彩"
+                        android:textColor="#ffffff"
+                        android:textSize="26sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="彩票管家"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="双色球 · 大乐透 彩票管理"
+                    android:textSize="13sp"
+                    android:textColor="@color/muted" />
+            </LinearLayout>
+
+            <!-- 模式切换 -->
+            <LinearLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_segment"
                 android:padding="4dp"
-                android:layout_marginBottom="18dp"
-                android:layout_gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/tabLogin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="8dp"
-                    android:text="@string/login_tab_login"
-                    android:textColor="@color/muted"
-                    android:textSize="14sp"
-                    android:textFontWeight="600" />
-
-                <TextView
-                    android:id="@+id/tabRegister"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="8dp"
-                    android:text="@string/login_tab_register"
-                    android:textColor="@color/muted"
-                    android:textSize="14sp"
-                    android:textFontWeight="600" />
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tabDevice"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="8dp"
-                    android:text="@string/login_tab_device"
-                    android:textColor="@color/muted"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:text="一键登录"
                     android:textSize="14sp"
-                    android:textFontWeight="600" />
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/tabLogin"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:text="登录"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/muted" />
+
+                <TextView
+                    android:id="@+id/tabRegister"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp"
+                    android:text="注册"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/muted" />
             </LinearLayout>
 
-            <!-- Form -->
+            <!-- 表单 -->
             <LinearLayout
-                android:id="@+id/formFields"
+                android:id="@+id/form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginTop="18dp">
 
-                <TextView
-                    android:id="@+id/labelUsername"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login_username"
-                    android:textColor="@color/muted"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="6dp" />
-
-                <EditText
-                    android:id="@+id/etUsername"
+                <LinearLayout
+                    android:id="@+id/fieldUser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_input"
-                    android:padding="10dp"
-                    android:textColorHint="@color/muted"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    android:inputType="text"
-                    android:autofillHints="username"
-                    android:hint="@string/login_username_hint"
-                    android:layout_marginBottom="14dp" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="14dp">
 
-                <TextView
-                    android:id="@+id/labelPassword"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login_password"
-                    android:textColor="@color/muted"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="用户名"
+                        android:textSize="13sp"
+                        android:textColor="@color/muted" />
 
-                <EditText
-                    android:id="@+id/etPassword"
+                    <EditText
+                        android:id="@+id/inputUser"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_input"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:textSize="14sp"
+                        android:inputType="text"
+                        android:importantForAutofill="no" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fieldPass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_input"
-                    android:padding="10dp"
-                    android:textColorHint="@color/muted"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    android:inputType="textPassword"
-                    android:autofillHints="password"
-                    android:hint="@string/login_password_hint"
-                    android:layout_marginBottom="14dp" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="14dp">
 
-                <TextView
-                    android:id="@+id/labelEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/login_email"
-                    android:textColor="@color/muted"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="密码"
+                        android:textSize="13sp"
+                        android:textColor="@color/muted" />
 
-                <EditText
-                    android:id="@+id/etEmail"
+                    <EditText
+                        android:id="@+id/inputPass"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_input"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:textSize="14sp"
+                        android:inputType="textPassword" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fieldEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_input"
-                    android:padding="10dp"
-                    android:textColorHint="@color/muted"
-                    android:textColor="@color/text"
-                    android:textSize="14sp"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/login_email_hint"
-                    android:layout_marginBottom="14dp" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="14dp"
+                    android:visibility="gone">
 
-                <ProgressBar
-                    android:id="@+id/loading"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:visibility="gone"
-                    android:indeterminateTint="@color/white"
-                    android:layout_gravity="center" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="邮箱（选填，中奖时用于通知）"
+                        android:textSize="13sp"
+                        android:textColor="@color/muted" />
+
+                    <EditText
+                        android:id="@+id/inputEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_input"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:textSize="14sp"
+                        android:inputType="textEmailAddress" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/btnSubmit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_primary"
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp"
+                    android:layout_marginTop="4dp">
+
+                    <ProgressBar
+                        android:id="@+id/btnSpinner"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="#ffffff"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/btnText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="登录"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btnSubmit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_btn_primary"
-                android:textColor="@color/white"
-                android:text="@string/login_action_login"
-                android:textFontWeight="600"
-                android:textSize="15sp"
-                android:textAllCaps="false"
-                android:minHeight="46dp"
-                android:layout_marginTop="4dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/login_tip"
-                android:textColor="@color/muted"
-                android:textSize="12sp"
-                android:gravity="center"
                 android:layout_marginTop="16dp"
-                android:lineSpacingMultiplier="1.5" />
-
+                android:gravity="center"
+                android:text="一键登录：本机生成持久设备号，下次打开自动登录，无需记密码；也可在「我的 → 编辑资料」里设置密码。"
+                android:textSize="12sp"
+                android:textColor="@color/muted" />
         </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</ScrollView>
