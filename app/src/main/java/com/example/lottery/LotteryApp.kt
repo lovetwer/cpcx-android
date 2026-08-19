@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 /**
  * 全局 Application：持有 Retrofit 实例、鉴权拦截器、AuthStore。
@@ -27,6 +28,9 @@ class LotteryApp : Application() {
         authStore = AuthStore(this)
 
         val client = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)   // AI 图片识别耗时较长，给 2 分钟
+            .writeTimeout(60, TimeUnit.SECONDS)
             .addInterceptor { chain ->
                 val req = chain.request()
                 val builder = req.newBuilder()
