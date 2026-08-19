@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -31,18 +30,19 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 应用内版本更新：
- * 1. 拉取 GitHub Releases 最新发布（api.github.com/repos/owner/repo/releases/latest）
- * 2. 解析 tag_name（版本号）与 assets 中的 .apk 直链
- * 3. 与 BuildConfig.VERSION_NAME 比较，有新版本则弹窗
- * 4. 确认后下载 APK 到外部文件目录，用 FileProvider 调起系统安装
+ * 1. 调后端 /api/version 获取最新版本信息（后端代理 GitHub Releases API）
+ * 2. 解析 tag（版本号）与 apk_url（指向后端 /api/download/apk）
+ * 3. 与当前版本比较，有新版本则弹窗
+ * 4. 确认后从后端下载 APK 到外部文件目录，用 FileProvider 调起系统安装
  *
- * 注意：GitHub API 必须带 User-Agent，否则返回 403。
+ * 注意：版本检查和下载都走后端代理，避免国内直连 GitHub 超时。
  */
 class UpdateManager(private val activity: AppCompatActivity) {
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)  // APK 下载可能较慢
+        .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
     private var cancelDownload = false
@@ -85,31 +85,23 @@ class UpdateManager(private val activity: AppCompatActivity) {
     }
 
     private fun fetchLatestRelease(): ReleaseInfo? {
-        val url =
-            "https://api.github.com/repos/${LotteryApp.GITHUB_OWNER}/${LotteryApp.GITHUB_REPO}/releases/latest"
+        // 走后端代理，不直连 GitHub
+        val url = "${LotteryApp.BASE_URL}/api/version"
         val req = Request.Builder()
             .url(url)
             .header("User-Agent", "cpcx-android")
-            .header("Accept", "application/vnd.github+json")
             .build()
         val resp = client.newCall(req).execute()
         if (!resp.isSuccessful) return null
         val bodyStr = resp.body?.string() ?: return null
         val json = JSONObject(bodyStr)
-        val tag = json.optString("tag_name", "")
-        val notes = json.optString("body", "")
+        val tag = json.optString("tag", "")
+        val notes = json.optString("notes", "")
         val htmlUrl = json.optString("html_url", "")
-        val assets = json.optJSONArray("assets") ?: JSONArray()
-        var apkUrl: String? = null
-        for (i in 0 until assets.length()) {
-            val a = assets.getJSONObject(i)
-            val name = a.optString("name", "")
-            if (name.endsWith(".apk", ignoreCase = true)) {
-                apkUrl = a.optString("browser_download_url", "")
-                break
-            }
-        }
-        if (tag.isBlank() || apkUrl.isNullOrEmpty()) return null
+        // apk_url 是相对路径（/api/download/apk），拼接后端域名
+        val apkPath = json.optString("apk_url", "")
+        val apkUrl = if (apkPath.startsWith("http")) apkPath else "${LotteryApp.BASE_URL}$apkPath"
+        if (tag.isBlank() || apkUrl.isBlank()) return null
         return ReleaseInfo(tag, notes, apkUrl, htmlUrl)
     }
 
