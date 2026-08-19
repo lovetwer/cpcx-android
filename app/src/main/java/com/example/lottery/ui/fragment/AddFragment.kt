@@ -381,6 +381,8 @@ class AddFragment : Fragment() {
                         binding.ballPicker.setPicked(Match.splitNums(p.red_balls), Match.splitNums(p.blue_balls))
                         loadDraws(keep = true)
                         ToastUtil.show(requireContext(), "已从图片识别，请核对后点击「保存彩票」", "info")
+                        // 滚动到选球器可见
+                        binding.ballPicker.post { binding.root.smoothScrollTo(0, binding.ballPicker.top) }
                     }
                     r.skipped != null && r.skipped.isNotEmpty() -> {
                         ToastUtil.show(requireContext(), r.skipped[0].reason, "error")
@@ -408,13 +410,46 @@ class AddFragment : Fragment() {
         }
         c.addView(head)
         multiParsed.forEachIndexed { i, b ->
-            val row = LinearLayout(requireContext()).apply { orientation = LinearLayout.HORIZONTAL; gravity = android.view.Gravity.CENTER_VERTICAL; val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.topMargin = dp(8); layoutParams = lp }
-            val idx = TextView(requireContext()).apply { text = (i + 1).toString(); textSize = 12f; setTextColor(ContextCompat.getColor(requireContext(), R.color.primary)); background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_pp_red); setPadding(dp(6), dp(2), dp(6), dp(2)); }
-            val typeLabel = TextView(requireContext()).apply { text = if (b.type == "dlt") " 大乐透 " else " 双色球 "; textSize = 12f; setTextColor(ContextCompat.getColor(requireContext(), R.color.muted)) }
-            val issue = TextView(requireContext()).apply { text = if (b.issue.isNotEmpty()) " 第${b.issue}期 " else " 期号待识别 "; textSize = 12f; setTextColor(ContextCompat.getColor(requireContext(), R.color.muted)) }
-            val bv = BallsView(requireContext()).apply { setSize(22); setBalls(b.type, b.red_balls, b.blue_balls) }
-            row.addView(idx); row.addView(typeLabel); row.addView(issue); row.addView(bv)
-            c.addView(row)
+            // 每注用垂直布局：第一行是序号+彩种+期号，第二行是号码球（可横向滚动）
+            val item = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                lp.topMargin = dp(10)
+                layoutParams = lp
+            }
+            // 第一行：序号 + 彩种 + 期号
+            val infoRow = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+            }
+            val idx = TextView(requireContext()).apply {
+                text = (i + 1).toString(); textSize = 12f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_pp_red)
+                setPadding(dp(6), dp(2), dp(6), dp(2))
+            }
+            val typeLabel = TextView(requireContext()).apply {
+                text = if (b.type == "dlt") " 大乐透 " else " 双色球 "; textSize = 12f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.muted))
+            }
+            val issueLabel = TextView(requireContext()).apply {
+                text = if (b.issue.isNotEmpty()) " 第${b.issue}期 " else " 期号待识别 "; textSize = 12f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.muted))
+            }
+            infoRow.addView(idx); infoRow.addView(typeLabel); infoRow.addView(issueLabel)
+            item.addView(infoRow)
+
+            // 第二行：号码球，用 HorizontalScrollView 包裹防止超出屏幕宽度被截断
+            val scroll = android.widget.HorizontalScrollView(requireContext()).apply {
+                isHorizontalScrollBarEnabled = false
+                val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                lp.topMargin = dp(6)
+                layoutParams = lp
+            }
+            val bv = BallsView(requireContext()).apply { setSize(26); setBalls(b.type, b.red_balls, b.blue_balls) }
+            scroll.addView(bv)
+            item.addView(scroll)
+            c.addView(item)
         }
         val actions = LinearLayout(requireContext()).apply { orientation = LinearLayout.HORIZONTAL; val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.topMargin = dp(10); layoutParams = lp }
         val saveAll = TextView(requireContext()).apply { text = "保存全部 ${multiParsed.size} 注"; setPadding(dp(16), dp(11), dp(16), dp(11)); textSize = 14f; setTypeface(null, android.graphics.Typeface.BOLD); setTextColor(ContextCompat.getColor(requireContext(), R.color.white)); background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_btn_primary) }
@@ -423,6 +458,9 @@ class AddFragment : Fragment() {
         cancel.setOnClickListener { multiParsed = emptyList(); binding.multiContainer.visibility = View.GONE; binding.multiContainer.removeAllViews() }
         actions.addView(saveAll); actions.addView(cancel)
         c.addView(actions)
+
+        // 滚动到多注区域可见
+        binding.multiContainer.post { binding.root.smoothScrollTo(0, binding.multiContainer.top) }
     }
 
     private fun saveMulti() {
