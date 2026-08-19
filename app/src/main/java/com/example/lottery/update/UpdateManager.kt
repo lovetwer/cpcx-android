@@ -31,18 +31,18 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 应用内版本更新：
- * 1. 调后端 /api/version 获取最新版本信息（后端代理 GitHub Releases API）
- * 2. 解析 tag（版本号）与 apk_url（指向后端 /api/download/apk）
+ * 1. 拉取 GitHub Releases 最新发布（api.github.com/repos/owner/repo/releases/latest）
+ * 2. 解析 tag_name（版本号）与 assets 中的 .apk 直链
  * 3. 与当前版本比较，有新版本则弹窗
- * 4. 确认后从后端下载 APK 到外部文件目录，用 FileProvider 调起系统安装
+ * 4. 确认后下载 APK 到外部文件目录，用 FileProvider 调起系统安装
  *
- * 注意：版本检查和下载都走后端代理，避免国内直连 GitHub 超时。
+ * 注意：GitHub API 必须带 User-Agent，否则返回 403。
  */
 class UpdateManager(private val activity: AppCompatActivity) {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(120, TimeUnit.SECONDS)  // APK 下载可能较慢
+        .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
@@ -86,81 +86,32 @@ class UpdateManager(private val activity: AppCompatActivity) {
     }
 
     private fun fetchLatestRelease(): ReleaseInfo? {
-        // 多源 fallback 策略：后端代理 → GitHub API 直连 → GitHub 镜像代理
-        // 1. 先试后端代理（如果后端已部署新代码）
-        val backendResult = tryFetchFromBackend()
-        if (backendResult != null) return backendResult
-
-        // 2. 再试 GitHub API 直连（海外网络可能可用）
-        val githubResult = tryFetchFromGitHub(
+        val url =
             "https://api.github.com/repos/${LotteryApp.GITHUB_OWNER}/${LotteryApp.GITHUB_REPO}/releases/latest"
-        )
-        if (githubResult != null) return githubResult
-
-        // 3. 最后试 GitHub 镜像代理（国内加速）
-        val mirrorResult = tryFetchFromGitHub(
-            "https://ghp.cx/https://api.github.com/repos/${LotteryApp.GITHUB_OWNER}/${LotteryApp.GITHUB_REPO}/releases/latest"
-        )
-        return mirrorResult
-    }
-
-    /** 从后端代理接口获取版本信息 */
-    private fun tryFetchFromBackend(): ReleaseInfo? {
-        return try {
-            val url = "${LotteryApp.BASE_URL}/api/version"
-            val req = Request.Builder().url(url).header("User-Agent", "cpcx-android").build()
-            val resp = client.newCall(req).execute()
-            if (!resp.isSuccessful) return null
-            val bodyStr = resp.body?.string() ?: return null
-            val json = JSONObject(bodyStr)
-            val tag = json.optString("tag", "")
-            if (tag.isBlank()) return null
-            val notes = json.optString("notes", "")
-            val htmlUrl = json.optString("html_url", "")
-            val apkPath = json.optString("apk_url", "")
-            val apkUrl = if (apkPath.startsWith("http")) apkPath else "${LotteryApp.BASE_URL}$apkPath"
-            ReleaseInfo(tag, notes, apkUrl, htmlUrl)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    /** 从 GitHub API（直连或镜像）获取版本信息 */
-    private fun tryFetchFromGitHub(apiUrl: String): ReleaseInfo? {
-        return try {
-            val req = Request.Builder()
-                .url(apiUrl)
-                .header("User-Agent", "cpcx-android")
-                .header("Accept", "application/vnd.github+json")
-                .build()
-            val resp = client.newCall(req).execute()
-            if (!resp.isSuccessful) return null
-            val bodyStr = resp.body?.string() ?: return null
-            val json = JSONObject(bodyStr)
-            val tag = json.optString("tag_name", "")
-            if (tag.isBlank()) return null
-            val notes = json.optString("body", "")
-            val htmlUrl = json.optString("html_url", "")
-            // 从 assets 中找 APK 下载链接
-            val assets = json.optJSONArray("assets") ?: return null
-            var apkUrl = ""
-            for (i in 0 until assets.length()) {
-                val a = assets.getJSONObject(i)
-                val name = a.optString("name", "")
-                if (name.endsWith(".apk", ignoreCase = true)) {
-                    apkUrl = a.optString("browser_download_url", "")
-                    break
-                }
+        val req = Request.Builder()
+            .url(url)
+            .header("User-Agent", "cpcx-android")
+            .header("Accept", "application/vnd.github+json")
+            .build()
+        val resp = client.newCall(req).execute()
+        if (!resp.isSuccessful) return null
+        val bodyStr = resp.body?.string() ?: return null
+        val json = JSONObject(bodyStr)
+        val tag = json.optString("tag_name", "")
+        val notes = json.optString("body", "")
+        val htmlUrl = json.optString("html_url", "")
+        val assets = json.optJSONArray("assets") ?: JSONArray()
+        var apkUrl: String? = null
+        for (i in 0 until assets.length()) {
+            val a = assets.getJSONObject(i)
+            val name = a.optString("name", "")
+            if (name.endsWith(".apk", ignoreCase = true)) {
+                apkUrl = a.optString("browser_download_url", "")
+                break
             }
-            if (apkUrl.isBlank()) return null
-            // 如果是 GitHub 直连链接且当前使用的镜像，则把下载链接也走镜像
-            if (apiUrl.contains("ghp.cx") && apkUrl.startsWith("https://github.com")) {
-                apkUrl = "https://ghp.cx/$apkUrl"
-            }
-            ReleaseInfo(tag, notes, apkUrl, htmlUrl)
-        } catch (e: Exception) {
-            null
         }
+        if (tag.isBlank() || apkUrl.isNullOrEmpty()) return null
+        return ReleaseInfo(tag, notes, apkUrl, htmlUrl)
     }
 
     private fun showUpdateDialog(r: ReleaseInfo) {
@@ -182,7 +133,7 @@ class UpdateManager(private val activity: AppCompatActivity) {
         activity.lifecycleScope.launch {
             try {
                 val file = withContext(Dispatchers.IO) {
-                    tryDownloadApk(apkUrl) { pct ->
+                    downloadApk(apkUrl) { pct ->
                         activity.runOnUiThread {
                             progressBar?.progress = pct
                             progressText?.text = "$pct%"
@@ -205,47 +156,6 @@ class UpdateManager(private val activity: AppCompatActivity) {
                 }
             }
         }
-    }
-
-    /** 多源下载 APK：原始链接失败时自动尝试 GitHub 镜像 */
-    private fun tryDownloadApk(apkUrl: String, onProgress: (Int) -> Unit): File {
-        // 先尝试原始链接
-        try {
-            return downloadApk(apkUrl, onProgress)
-        } catch (e: Exception) {
-            if (cancelDownload) throw e
-            // 原始链接失败，继续尝试镜像
-        }
-
-        // 如果原始链接是 GitHub，尝试镜像代理
-        if (apkUrl.contains("github.com")) {
-            val mirrorUrl = "https://ghp.cx/$apkUrl"
-            try {
-                return downloadApk(mirrorUrl, onProgress)
-            } catch (e: Exception) {
-                if (cancelDownload) throw e
-            }
-        }
-
-        // 如果原始链接是后端代理，尝试 GitHub 直连 + 镜像
-        if (apkUrl.contains("${LotteryApp.BASE_URL}")) {
-            // GitHub 直连
-            val ghUrl = "https://github.com/${LotteryApp.GITHUB_OWNER}/${LotteryApp.GITHUB_REPO}/releases/download/latest/cpcx-latest.apk"
-            try {
-                return downloadApk(ghUrl, onProgress)
-            } catch (e: Exception) {
-                if (cancelDownload) throw e
-            }
-            // GitHub 镜像
-            val mirrorUrl = "https://ghp.cx/$ghUrl"
-            try {
-                return downloadApk(mirrorUrl, onProgress)
-            } catch (e: Exception) {
-                if (cancelDownload) throw e
-            }
-        }
-
-        throw IOException("所有下载源均不可用")
     }
 
     private fun downloadApk(url: String, onProgress: (Int) -> Unit): File {
@@ -286,7 +196,7 @@ class UpdateManager(private val activity: AppCompatActivity) {
             data = uri
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-        // 部分系统在未授予“安装未知应用”权限时会跳转设置页，这里做兜底提示
+        // 部分系统在未授予"安装未知应用"权限时会跳转设置页，这里做兜底提示
         try {
             activity.startActivity(intent)
         } catch (e: Exception) {
