@@ -78,6 +78,7 @@ class ProfileFragment : Fragment() {
         binding.inputUsername.visibility = View.VISIBLE
         binding.inputEmail.visibility = View.VISIBLE
         binding.btnEdit.visibility = View.GONE
+        binding.btnChangePwd.visibility = View.GONE
         binding.btnCancelEdit.visibility = View.VISIBLE
         binding.btnSave.visibility = View.VISIBLE
     }
@@ -89,6 +90,7 @@ class ProfileFragment : Fragment() {
         binding.inputUsername.visibility = View.GONE
         binding.inputEmail.visibility = View.GONE
         binding.btnEdit.visibility = View.VISIBLE
+        binding.btnChangePwd.visibility = View.VISIBLE
         binding.btnCancelEdit.visibility = View.GONE
         binding.btnSave.visibility = View.GONE
     }

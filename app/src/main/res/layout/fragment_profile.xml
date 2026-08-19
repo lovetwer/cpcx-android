@@ -263,22 +263,22 @@
                     android:background="@drawable/bg_btn_primary"
                     android:layout_marginStart="10dp"
                     android:visibility="gone" />
-            </LinearLayout>
 
-            <!-- 修改密码入口 -->
-            <TextView
-                android:id="@+id/btnChangePwd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="11dp"
-                android:paddingBottom="11dp"
-                android:layout_marginTop="10dp"
-                android:text="修改密码"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/text"
-                android:background="@drawable/bg_btn_ghost" />
+                <TextView
+                    android:id="@+id/btnChangePwd"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingTop="11dp"
+                    android:paddingBottom="11dp"
+                    android:text="修改密码"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:layout_marginStart="10dp" />
+            </LinearLayout>
 
             <!-- 修改密码面板（默认隐藏） -->
             <LinearLayout

@@ -37,9 +37,11 @@ fun fmtDate(s: String?): String {
 fun weekName(s: String?): String {
     if (s.isNullOrEmpty()) return ""
     return try {
-        val d = ISSUE_FMT.parse(s)
-        if (d != null) "周" + WEEK[(d.time / 86400000L + 4).toInt() % 7]
-        else ""
+        val d = ISSUE_FMT.parse(s) ?: return ""
+        val cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("Asia/Shanghai"))
+        cal.time = d
+        val dayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK) // 1=周日, 2=周一, ..., 7=周六
+        "周" + WEEK[dayOfWeek - 1]
     } catch (e: Exception) {
         ""
     }
