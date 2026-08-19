@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -32,9 +31,9 @@ import java.util.concurrent.TimeUnit
 /**
  * 应用内版本更新：
  * 1. 拉取 GitHub Releases 最新发布（api.github.com/repos/owner/repo/releases/latest）
- * 2. 解析 tag_name（版本号）与 assets 中的 .apk 直链
+ * 2. 解析 tag_name（版本号）
  * 3. 与当前版本比较，有新版本则弹窗
- * 4. 确认后下载 APK 到外部文件目录，用 FileProvider 调起系统安装
+ * 4. 确认后通过 jsDelivr CDN 下载 APK（国内加速），用 FileProvider 调起系统安装
  *
  * 注意：GitHub API 必须带 User-Agent，否则返回 403。
  */
@@ -100,17 +99,10 @@ class UpdateManager(private val activity: AppCompatActivity) {
         val tag = json.optString("tag_name", "")
         val notes = json.optString("body", "")
         val htmlUrl = json.optString("html_url", "")
-        val assets = json.optJSONArray("assets") ?: JSONArray()
-        var apkUrl: String? = null
-        for (i in 0 until assets.length()) {
-            val a = assets.getJSONObject(i)
-            val name = a.optString("name", "")
-            if (name.endsWith(".apk", ignoreCase = true)) {
-                apkUrl = a.optString("browser_download_url", "")
-                break
-            }
-        }
-        if (tag.isBlank() || apkUrl.isNullOrEmpty()) return null
+        if (tag.isBlank()) return null
+        // 下载 APK 走 jsDelivr CDN 加速（APK 放在 release 分支根目录）
+        // jsDelivr 国内有 CDN 节点，比直连 GitHub 快且稳定
+        val apkUrl = "https://cdn.jsdelivr.net/gh/${LotteryApp.GITHUB_OWNER}/${LotteryApp.GITHUB_REPO}@release/cpcx.apk"
         return ReleaseInfo(tag, notes, apkUrl, htmlUrl)
     }
 
