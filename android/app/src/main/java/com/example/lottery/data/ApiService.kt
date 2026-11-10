@@ -28,7 +28,18 @@ interface ApiService {
     suspend fun listLottery(@QueryMap params: Map<String, String>): ListResp<Lottery>
 
     @POST("/api/lottery")
-    suspend fun createLottery(@Body body: Map<String, Any>): BaseResp
+    suspend fun createLottery(@Body body: CreateLotteryReq): BaseResp
+
+    data class CreateLotteryReq(
+        val type: String,
+        val issue: String,
+        val red_balls: String,
+        val blue_balls: String,
+        val play_type: String,
+        val multiple: Int,
+        val banker_red: String,
+        val banker_blue: String
+    )
 
     @POST("/api/lottery/batch")
     suspend fun batchLottery(@Body body: BatchLotteryReq): BatchResp

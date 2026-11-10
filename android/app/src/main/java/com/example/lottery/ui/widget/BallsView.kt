@@ -86,7 +86,7 @@ class BallsView @JvmOverloads constructor(
             if (isDlt && showLabels) addView(labelView("前区"))
             for (b in reds) addView(ballView(b, true, hitR.contains(b)))
             if (blues.isNotEmpty()) {
-                addView(sepView())
+                if (reds.isNotEmpty()) addView(sepView())
                 if (isDlt && showLabels) addView(labelView("后区"))
                 for (b in blues) addView(ballView(b, false, hitB.contains(b)))
             }

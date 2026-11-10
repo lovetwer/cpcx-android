@@ -32,6 +32,8 @@ object Api {
                 try { gson.fromJson(it, BaseResp::class.java).msg } catch (_: Exception) { null }
             }
             throw ApiException(msg ?: "请求失败（${e.code()}）")
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: ApiException) {
             throw e
         } catch (e: Exception) {
@@ -61,7 +63,7 @@ object Api {
     suspend fun listLottery(params: Map<String, String>): List<Lottery> =
         run { svc.listLottery(params).list ?: emptyList() }
 
-    suspend fun createLottery(body: Map<String, Any>): BaseResp = run { svc.createLottery(body) }
+    suspend fun createLottery(body: ApiService.CreateLotteryReq): BaseResp = run { svc.createLottery(body) }
 
     suspend fun batchLottery(items: List<Map<String, String>>): BatchResp =
         run { svc.batchLottery(ApiService.BatchLotteryReq(items)) }

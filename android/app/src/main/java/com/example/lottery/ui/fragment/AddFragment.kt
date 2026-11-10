@@ -20,6 +20,10 @@ import com.example.lottery.LotteryApp
 import com.example.lottery.MainActivity
 import com.example.lottery.R
 import com.example.lottery.data.Api
+import com.example.lottery.data.ApiService
+import com.example.lottery.util.DrawDateOptions
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import com.example.lottery.data.model.DrawResult
 import com.example.lottery.data.model.ParsedLot
 import com.example.lottery.databinding.FragmentAddBinding
@@ -46,6 +50,7 @@ class AddFragment : Fragment() {
     private var issue = ""
     private var multiple = 1
     private var draws = emptyList<DrawResult>()
+    private var drawJob: Job? = null
     private var recognizing = false
     private var saving = false
     private var multiParsed = emptyList<ParsedLot>()
@@ -75,11 +80,14 @@ class AddFragment : Fragment() {
 
         binding.issueSpinner.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p: android.widget.AdapterView<*>, v: View?, pos: Int, id: Long) {
-                if (pos in issueDates.indices) issue = issueDates[pos]
+                if (pos in issueDates.indices) {
+                    issue = issueDates[pos]
+                    updateSaveSummary()
+                }
             }
             override fun onNothingSelected(p: android.widget.AdapterView<*>) {}
         }
-        binding.issueInput.addTextChangedListener(SimpleWatcher { issue = it })
+        binding.issueInput.addTextChangedListener(SimpleWatcher { issue = it.trim(); updateSaveSummary() })
 
         binding.ocrDrop.setOnClickListener { pickImage.launch("image/*") }
         binding.batchLink.setOnClickListener { showBatchDialog() }
@@ -141,44 +149,54 @@ class AddFragment : Fragment() {
     /* ---------------- 开奖日期 ---------------- */
 
     private fun loadDraws(keep: Boolean) {
-        lifecycleScope.launch {
-            draws = try { Api.listDraw(type) } catch (e: Exception) { emptyList() }
-            refreshOptions(keep)
+        drawJob?.cancel()
+        val requestedType = type
+        val issueAtRequest = issue
+        drawJob = viewLifecycleOwner.lifecycleScope.launch {
+            val result = try {
+                Api.listDraw(requestedType)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                emptyList()
+            }
+            if (requestedType != type || _binding == null) return@launch
+            draws = result
+            refreshOptions(keep, issueAtRequest)
             updatePreview()
             updateSaveSummary()
         }
     }
 
-    private fun refreshOptions(keep: Boolean) {
-        val upcoming = computeUpcoming(type)
-        val history = draws.sortedByDescending { it.issue }.mapNotNull { if (it.draw_date.isNotEmpty()) it.draw_date else null }
-
+    private fun refreshOptions(keep: Boolean, issueAtRequest: String) {
+        val options = DrawDateOptions.build(computeUpcoming(type), draws, issue, keep, issueAtRequest)
+        issue = options.selected
         issueDates.clear(); issueLabels.clear()
-        for (d in upcoming) {
-            issueDates.add(d)
-            issueLabels.add("${fmtDate(d)} ${weekName(d)} · 未开奖")
-        }
-        for (d in history) {
-            issueDates.add(d)
-            issueLabels.add("${fmtDate(d)} ${weekName(d)} · 已开奖")
+        for (option in options.items) {
+            issueDates.add(option.value)
+            val state = when (option.drawn) {
+                true -> "已开奖"
+                false -> "未开奖"
+                null -> "识别/手填，请核对"
+            }
+            issueLabels.add("${fmtDate(option.value)} ${weekName(option.value)} · $state")
         }
 
         if (draws.isEmpty()) {
             binding.issueSpinner.visibility = View.GONE
             binding.issueInput.visibility = View.VISIBLE
-            binding.issueHint.text = "暂无开奖数据，可手动填写期号"
-            if (!keep || issue.isEmpty()) issue = binding.issueInput.text.toString().trim()
+            binding.issueHint.text = "暂无开奖数据，请核对并填写开奖日期或期号"
+            binding.issueInput.setText(issue)
         } else {
             binding.issueSpinner.visibility = View.VISIBLE
             binding.issueInput.visibility = View.GONE
-            binding.issueHint.text = "默认选“未开奖”期，买的是未来开奖的彩票"
+            binding.issueHint.text = "默认选“未开奖”期，识别后请核对开奖日期"
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, issueLabels)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.issueSpinner.adapter = adapter
-            val target = if (keep && issue in issueDates) issue else (upcoming.firstOrNull() ?: "")
-            issue = target
-            val idx = issueDates.indexOf(target).coerceAtLeast(0)
+            val idx = issueDates.indexOf(options.selected).coerceAtLeast(0)
             binding.issueSpinner.setSelection(idx)
+            issue = options.selected
         }
     }
 
@@ -261,7 +279,11 @@ class AddFragment : Fragment() {
             }
             row.addView(empty)
         } else {
-            val bv = BallsView(requireContext()).apply { setSize(26); setBalls(type, nums.joinToString(","), "") }
+            val bv = BallsView(requireContext()).apply {
+                setSize(26)
+                val numbers = nums.joinToString(",")
+                setBalls(type, if (isRed) numbers else "", if (isRed) "" else numbers, showLabels = false)
+            }
             val blp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             blp.marginStart = dp(8)
             bv.layoutParams = blp
@@ -323,15 +345,15 @@ class AddFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val r = Api.createLottery(
-                    mapOf(
-                        "type" to type,
-                        "issue" to issue.trim(),
-                        "red_balls" to p.red.joinToString(","),
-                        "blue_balls" to p.blue.joinToString(","),
-                        "play_type" to mode,
-                        "multiple" to multiple,
-                        "banker_red" to p.bankerRed.joinToString(","),
-                        "banker_blue" to p.bankerBlue.joinToString(",")
+                    ApiService.CreateLotteryReq(
+                        type = type,
+                        issue = issue.trim(),
+                        red_balls = p.red.joinToString(","),
+                        blue_balls = p.blue.joinToString(","),
+                        play_type = mode,
+                        multiple = multiple,
+                        banker_red = p.bankerRed.joinToString(","),
+                        banker_blue = p.bankerBlue.joinToString(",")
                     )
                 )
                 if (r.ok != false) {
