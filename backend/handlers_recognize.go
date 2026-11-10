@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+// recognizeLottery 允许处理器测试使用进程内替身，避免调用外部 OCR 服务。
+var recognizeLottery = RecognizeLottery
+
 // handleRecognize 上传彩票截图，调用 OCR 识别并自动录入。
 // 同时挂载在 /api/lottery/recognize 与 /lottery/ai-generate 两个路径。
 func handleRecognize(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +26,7 @@ func handleRecognize(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "读取图片失败")
 		return
 	}
-	results, err := RecognizeLottery(buf, "upload.jpg")
+	results, err := recognizeLottery(buf, "upload.jpg")
 	if err != nil {
 		writeError(w, http.StatusBadGateway, "识别失败："+err.Error())
 		return
@@ -68,7 +71,10 @@ func handleRecognize(w http.ResponseWriter, r *http.Request) {
 			})
 			continue
 		}
-		lot := Lottery{UserID: uid, Type: res.Type, Issue: drawDate, RedBalls: red, BlueBalls: blue, Status: StatusPending}
+		lot := Lottery{
+			UserID: uid, Type: res.Type, Issue: drawDate, RedBalls: red, BlueBalls: blue,
+			PlayType: "single", Multiple: 1, Bets: 1, Status: StatusPending,
+		}
 		if err := insertLottery(&lot); err != nil {
 			skipped = append(skipped, map[string]interface{}{"issue": res.Issue, "reason": "写入失败"})
 			continue

@@ -1,17 +1,21 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type registerReq struct {
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	DeviceID  string `json:"device_id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	DeviceID string `json:"device_id"`
 }
 
 type loginReq struct {
@@ -95,22 +99,67 @@ func handleDeviceLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u, err := getUserByDevice(req.DeviceID)
-	if err != nil {
-		// 自动创建该设备对应的用户，用户名 = 机型_时间戳，确保不重复
-		username := req.DeviceModel + "_" + fmt.Sprintf("%d", time.Now().Unix())
-		pw, _ := hashPassword(randHex(12))
-		res, e := DB.Exec("INSERT INTO users(username,password,device_id,email) VALUES(?,?,?,?)",
-			username, pw, req.DeviceID, req.Email)
-		// 若用户名冲突（极端情况），追加随机后缀重试
-		for e != nil {
-			username = req.DeviceModel + "_" + fmt.Sprintf("%d", time.Now().UnixNano())
-			res, e = DB.Exec("INSERT INTO users(username,password,device_id,email) VALUES(?,?,?,?)",
-				username, pw, req.DeviceID, req.Email)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		writeError(w, http.StatusInternalServerError, "数据库错误")
+		return
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		// 只有设备尚无用户时才建号，数据库故障不能当作用户不存在。
+		username := fmt.Sprintf("%s_%d", req.DeviceModel, time.Now().Unix())
+		pw, err := hashPassword(randHex(12))
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "密码处理失败")
+			return
 		}
-		id, _ := res.LastInsertId()
-		u, _ = getUserByID(id)
+		var res sql.Result
+		const maxUsernameRetries = 3
+		for attempt := 0; attempt <= maxUsernameRetries; attempt++ {
+			if attempt > 0 {
+				// 序号保证即使时钟精度不足，每次重试也使用不同的用户名。
+				username = fmt.Sprintf("%s_%d_%d", req.DeviceModel, time.Now().UnixNano(), attempt)
+			}
+			res, err = DB.Exec("INSERT INTO users(username,password,device_id,email) VALUES(?,?,?,?)",
+				username, pw, req.DeviceID, req.Email)
+			if err == nil {
+				break
+			}
+			if !isUsernameCollision(err) || attempt == maxUsernameRetries {
+				writeError(w, http.StatusInternalServerError, "注册失败")
+				return
+			}
+		}
+		id, err := res.LastInsertId()
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "注册失败")
+			return
+		}
+		var ok bool
+		u, ok = getUserByID(id)
+		if !ok || u == nil {
+			writeError(w, http.StatusInternalServerError, "用户信息查询失败")
+			return
+		}
 	}
 	writeJSON(w, http.StatusOK, authResp{OK: true, Token: generateToken(u.ID), User: u})
+}
+
+// isUsernameCollision 只重试 users 的用户名唯一索引，不掩盖其他数据库错误。
+func isUsernameCollision(err error) bool {
+	var mysqlErr *mysql.MySQLError
+	if !errors.As(err, &mysqlErr) || mysqlErr.Number != 1062 {
+		return false
+	}
+	const marker = " for key "
+	pos := strings.LastIndex(mysqlErr.Message, marker)
+	if pos < 0 {
+		return false
+	}
+	key := strings.Trim(mysqlErr.Message[pos+len(marker):], "'`")
+	// MySQL 8 的索引名可带表名前缀，如 users.uniq_username。
+	if pos := strings.LastIndex(key, "."); pos >= 0 {
+		key = key[pos+1:]
+	}
+	return key == "uniq_username"
 }
 
 // handleMe 返回当前用户
@@ -127,24 +176,29 @@ func handleMe(w http.ResponseWriter, r *http.Request) {
 
 // handleUpdateMe 更新当前用户资料（邮箱 / 昵称 / 密码）
 func handleUpdateMe(w http.ResponseWriter, r *http.Request) {
+	uid := currentUserID(r)
+	curUser, ok := getUserByID(uid)
+	if !ok || curUser == nil {
+		writeError(w, http.StatusUnauthorized, "用户不存在")
+		return
+	}
 	var body struct {
-		Email      string `json:"email"`
-		Username   string `json:"username"`
-		Password   string `json:"password"`
+		Email       string `json:"email"`
+		Username    string `json:"username"`
+		Password    string `json:"password"`
 		OldPassword string `json:"old_password"`
 	}
 	if err := readJSON(r, &body); err != nil {
 		writeError(w, http.StatusBadRequest, "请求格式错误")
 		return
 	}
-	uid := currentUserID(r)
 	var sets []string
 	var args []interface{}
 	if body.Email != "" {
 		sets = append(sets, "email=?")
 		args = append(args, body.Email)
 	}
-	if body.Username != "" && body.Username != authUser(r).Username {
+	if body.Username != "" && body.Username != curUser.Username {
 		var cnt int
 		if err := DB.QueryRow("SELECT COUNT(*) FROM users WHERE username=? AND id<>?", body.Username, uid).Scan(&cnt); err == nil && cnt > 0 {
 			writeError(w, http.StatusConflict, "用户名已存在")
@@ -158,13 +212,7 @@ func handleUpdateMe(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "密码至少6位")
 			return
 		}
-		// 获取当前用户信息（含密码哈希）
-		curUser, _ := getUserByID(uid)
-		if curUser == nil {
-			writeError(w, http.StatusUnauthorized, "用户不存在")
-			return
-		}
-		// 查询包含密码哈希的用户信息
+		// 复用当前用户的昵称，查询包含密码哈希的用户信息
 		fullUser, err := getUserByUsername(curUser.Username)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, "用户信息查询失败")

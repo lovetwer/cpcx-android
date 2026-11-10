@@ -49,7 +49,8 @@ func handleCreateLottery(w http.ResponseWriter, r *http.Request) {
 	if playType == "" {
 		playType = "single"
 	}
-	red, blue, ok := validateTicket(req.Type, playType, req.RedBalls, req.BlueBalls, req.BankerRed, req.BankerBlue)
+	bankerRed, bankerBlue := normalizeBalls(req.BankerRed), normalizeBalls(req.BankerBlue)
+	red, blue, ok := validateTicket(req.Type, playType, req.RedBalls, req.BlueBalls, bankerRed, bankerBlue)
 	if !ok {
 		writeError(w, http.StatusBadRequest, "号码不符合玩法规则：双色球6红+1蓝(复式红≤20/蓝≤16)，大乐透5前+2后(复式前≤12/后≤12)")
 		return
@@ -58,10 +59,10 @@ func handleCreateLottery(w http.ResponseWriter, r *http.Request) {
 	if mult < 1 {
 		mult = 1
 	}
-	bets := ticketBets(req.Type, red, blue, req.BankerRed, req.BankerBlue)
+	bets := ticketBets(req.Type, red, blue, bankerRed, bankerBlue)
 	lot := Lottery{
 		UserID: currentUserID(r), Type: req.Type, Issue: issue, RedBalls: red, BlueBalls: blue,
-		PlayType: playType, Multiple: mult, BankerRed: req.BankerRed, BankerBlue: req.BankerBlue,
+		PlayType: playType, Multiple: mult, BankerRed: bankerRed, BankerBlue: bankerBlue,
 		Bets: bets, Status: StatusPending,
 	}
 	if err := insertLottery(&lot); err != nil {
@@ -105,7 +106,10 @@ func handleBatchLottery(w http.ResponseWriter, r *http.Request) {
 			fails = append(fails, "期号"+issue+" 号码格式错误")
 			continue
 		}
-		lot := Lottery{UserID: uid, Type: it.Type, Issue: issue, RedBalls: red, BlueBalls: blue, Status: StatusPending}
+		lot := Lottery{
+			UserID: uid, Type: it.Type, Issue: issue, RedBalls: red, BlueBalls: blue,
+			PlayType: "single", Multiple: 1, Bets: 1, Status: StatusPending,
+		}
 		if err := insertLottery(&lot); err != nil {
 			failCount++
 			fails = append(fails, "期号"+it.Issue+" "+err.Error())
