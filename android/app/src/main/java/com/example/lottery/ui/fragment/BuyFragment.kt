@@ -513,7 +513,9 @@ class BuyFragment : Fragment() {
                 val r = Api.createShare(ids)
                 android.util.Log.d("BuyShare", "createShare resp ok=${r.ok} code=${r.code} msg=${r.msg}")
                 if (!r.code.isNullOrEmpty()) {
-                    val url = LotteryApp.WEB_BASE_URL + "/#/share?code=" + r.code
+                    // 走后端 /share 落地页：微信爬虫抓得到服务端生成的动态卡片文字，
+                    // 浏览器打开会被 JS 跳到 SPA 的 #/share 页
+                    val url = LotteryApp.BASE_URL + "/share?code=" + r.code
                     copyToClipboard(url)
                     ToastUtil.show(requireContext(), "分享链接已复制：" + url, "success")
                     val intent = Intent(Intent.ACTION_SEND).apply {
