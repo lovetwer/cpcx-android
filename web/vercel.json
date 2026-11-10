@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/share",
+      "destination": "https://cpcxapi.800820882.xyz/share"
+    }
+  ]
+}
