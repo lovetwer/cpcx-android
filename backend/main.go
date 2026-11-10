@@ -58,6 +58,7 @@ func main() {
 	// 分享模块
 	router.Handle("POST", "/api/share", authMiddleware(handleCreateShare))
 	router.Handle("GET", "/api/share", handleGetShare) // 公开访问，无需登录
+	router.Handle("GET", "/share", handleSharePage)    // 分享落地页：给微信/QQ 爬虫生成动态卡片，再 JS 跳 SPA
 
 	// 保活心跳
 	router.Handle("GET", "/health", handleHealth)

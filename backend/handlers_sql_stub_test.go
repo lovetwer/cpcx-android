@@ -22,7 +22,8 @@ type handlerSQLStep struct {
 	exec   bool
 	query  string
 	args   []driver.Value
-	row    []driver.Value
+	row    []driver.Value   // single-row convenience; ignored when rows is set
+	rows   [][]driver.Value // multi-row result for IN queries; empty slice = zero matches
 	err    error
 	result driver.Result
 	check  func([]driver.NamedValue)
@@ -100,7 +101,11 @@ func (c *handlerSQLConn) QueryContext(_ context.Context, query string, args []dr
 	if step.err != nil {
 		return nil, step.err
 	}
-	return &handlerSQLRows{row: step.row}, nil
+	batch := step.rows
+	if batch == nil && step.row != nil {
+		batch = [][]driver.Value{step.row}
+	}
+	return &handlerSQLRows{rows: batch}, nil
 }
 func (c *handlerSQLConn) ExecContext(_ context.Context, query string, args []driver.NamedValue) (driver.Result, error) {
 	step := c.take(true, query, args)
@@ -114,12 +119,16 @@ func (c *handlerSQLConn) ExecContext(_ context.Context, query string, args []dri
 }
 
 type handlerSQLRows struct {
-	row  []driver.Value
-	done bool
+	rows [][]driver.Value
+	idx  int
 }
 
 func (r *handlerSQLRows) Columns() []string {
-	cols := make([]string, len(r.row))
+	width := 0
+	if len(r.rows) > 0 {
+		width = len(r.rows[0])
+	}
+	cols := make([]string, width)
 	for i := range cols {
 		cols[i] = fmt.Sprintf("column_%d", i)
 	}
@@ -127,11 +136,11 @@ func (r *handlerSQLRows) Columns() []string {
 }
 func (r *handlerSQLRows) Close() error { return nil }
 func (r *handlerSQLRows) Next(dest []driver.Value) error {
-	if r.done || r.row == nil {
+	if r.idx >= len(r.rows) {
 		return io.EOF
 	}
-	r.done = true
-	copy(dest, r.row)
+	copy(dest, r.rows[r.idx])
+	r.idx++
 	return nil
 }
 

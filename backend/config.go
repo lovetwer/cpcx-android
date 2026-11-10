@@ -29,6 +29,7 @@ type Config struct {
 	AgnesAPIKey   string
 	AgnesAPIURL   string
 	AgnesModel    string
+	WebURL        string // 前端站点地址，用于分享落地页跳转和 OG 卡片图片
 }
 
 func getEnv(key, def string) string {
@@ -73,5 +74,6 @@ func LoadConfig() Config {
 		AgnesAPIKey:   getEnv("AGNES_API_KEY", ""),
 		AgnesAPIURL:   getEnv("AGNES_API_URL", "https://apihub.agnes-ai.com/v1/chat/completions"),
 		AgnesModel:    getEnv("AGNES_MODEL", "agnes-2.5-flash"),
+		WebURL:        getEnv("WEB_URL", "https://cpcx.800820882.xyz"),
 	}
 }
