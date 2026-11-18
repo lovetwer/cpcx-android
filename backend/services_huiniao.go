@@ -86,17 +86,29 @@ func httpGetJSON(url string) ([]byte, error) {
 
 // ---------- 统一拉奖入口 ----------
 
-// PullLottery 从灰鸟API抓取双色球/大乐透最近开奖并入库
+// PullLottery 多数据源抓取双色球/大乐透最近开奖并入库。
+// 主源：双色球=500彩票网、大乐透=体彩官方（services_sources.go）；
+// 主源请求失败时自动回退灰鸟API（本文件），避免单源故障导致一直"待开奖"。
 func PullLottery() (bool, error) {
-	types := []string{TypeSSQ, TypeDLT}
+	fallbacks := map[string][]func() (bool, error){
+		TypeSSQ: {pullSSQ500, pullSSQ},       // 500彩票网 → 灰鸟
+		TypeDLT: {pullDLTSporttery, pullDLT}, // 体彩官方 → 灰鸟
+	}
 	var lastErr error
 	anyNew := false
-	for _, t := range types {
-		isNew, err := pullOneType(t)
-		if err != nil {
-			logErr("拉取 %s 失败: %v", TypeName(t), err)
-			lastErr = err
-		} else if isNew {
+	for _, t := range []string{TypeSSQ, TypeDLT} {
+		isNew := false
+		for _, pull := range fallbacks[t] {
+			isNew, lastErr = pull()
+			if lastErr == nil {
+				break // 该源成功，不再回退
+			}
+			logErr("拉取 %s 失败，尝试下一数据源: %v", TypeName(t), lastErr)
+		}
+		if lastErr != nil {
+			continue
+		}
+		if isNew {
 			anyNew = true
 			logInfo("拉取 %s 完成（有新数据）", TypeName(t))
 		} else {
