@@ -18,6 +18,6 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 		"status":  status,
 		"time":    time.Now().Format(time.RFC3339),
 		"service": "lottery-manager",
-		"version": "v1.3.11-share-card",
+		"version": "v1.4.0-multi-source",
 	})
 }

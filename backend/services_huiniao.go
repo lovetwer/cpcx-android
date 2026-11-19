@@ -92,7 +92,7 @@ func httpGetJSON(url string) ([]byte, error) {
 func PullLottery() (bool, error) {
 	fallbacks := map[string][]func() (bool, error){
 		TypeSSQ: {pullSSQ500, pullSSQ},       // 500彩票网 → 灰鸟
-		TypeDLT: {pullDLTSporttery, pullDLT}, // 体彩官方 → 灰鸟
+		TypeDLT: {pullDLTSporttery, pullDLT500, pullDLT}, // 体彩官方 → 500彩票网 → 灰鸟
 	}
 	var lastErr error
 	anyNew := false
